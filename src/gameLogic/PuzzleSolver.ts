@@ -35,7 +35,7 @@ export class PuzzleSolver{
             else{
                 this.closed.push(min);
                 children = min.generateChildren()
-                children = children.sort(() => Math.random() - 0.5);
+                //children = children.sort(() => Math.random() - 0.5);
                 children.forEach((child) =>{
                     flag = child.checkInclusive(this.pq, this.closed)
                     switch (flag[0]){
@@ -54,5 +54,5 @@ export class PuzzleSolver{
                 })
             }
         }
-    }  
+    }
 }

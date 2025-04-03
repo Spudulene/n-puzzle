@@ -36,9 +36,14 @@ export class Game{
         
         this.goal = new State(goalState, 0, null, null)
     }
+    
+    //TODO
+    private isSolvableEven(){
 
-    // NEEDS TO BE CHANGED FOR A 4X4
-    private isSolvable() {
+    }
+
+    private isSolvableOdd(){
+        // Solvable if the number of inversions is even
         let inversions = 0;
         let emptyValue = 0;
         let temp : number[] = [];
@@ -59,7 +64,11 @@ export class Game{
             }
         }
     
-        return inversions % 2 === 0;  // Solvable if the number of inversions is even
+        return inversions % 2 === 0;
+    }
+    
+    private isSolvable() {
+        return this.size % 2 == 1 ? this.isSolvableOdd() : this.isSolvableEven()
     }
 
     public printPath(board: State | null, recursions: number){
@@ -78,11 +87,9 @@ export class Game{
     // give parameter for AI game vs human game??
     public startGame(){
         this.generateGoalBoard();
-        /* this.generateStartBoard();
+        this.generateStartBoard();
         while (!this.isSolvable()){
             this.generateStartBoard()
-        } */
-
-       this.start = new State([[6,0,7],[1,2,3],[4,5,8]],0,null,this.goal)
+        }
     }
 }

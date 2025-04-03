@@ -31,7 +31,6 @@ export class State{
     }
 
     public printState() {
-
         const state = this.tileSeq.map((d) => d.join(" ")).join("\n")
         console.log(state)
     }
@@ -45,28 +44,33 @@ export class State{
 
     public calculateCost(heuristic: string) {
         switch (heuristic) {
+            // time: .5 sec. moves: 88
             case "MISPLACED":
                 this.cost = this.calculateMisplaced();
                 break;
+            // time: .1 sec. moves: 51
             case "MANHATTAN":
                 this.cost = this.calculateManhattanDistance();
                 break;
+            // time: .3 sec. moves: 75
             case "INVERSIONS":
                 this.cost = this.calculateInversionCount();
                 break;
+            // time: .06 sec. moves: 32
             case "WALKING DISTANCE":
                 this.cost = this.calculateWalkingDistance();
                 break;
+            // time: 10 sec. moves: 22
             case "MANHATTAN AND DEPTH":
                 this.cost = this.calculateManhattanDistanceAndDepth();
                 break;
+            // time: .5 sec. moves: 39
             case "MANHATTAN AND LINEAR CONFLICT":
                 this.cost = this.calculateManhattanDistanceAndLinearConflict();
                 break;
         }
     }
 
-    // WORKS!!
     private calculateMisplaced(){
         if (this.goal === null) return 0;
         let misplaced = 0;
@@ -81,7 +85,6 @@ export class State{
         return misplaced;
     }
 
-    // Implement
     private calculateManhattanDistance(){
         let size = this.tileSeq.length;
         let flattenedGoal : number[] = [];
@@ -105,25 +108,96 @@ export class State{
         }, 0);
     }
 
-    // Implement
     private calculateInversionCount(){
-        if (this.goal === null) return 0;
-        return 1;
+        let inversions = 0;
+        let flattenedState : number[] = [];
+        // Flatten the start state
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.tileSeq[i].length; j++) {
+                flattenedState.push(this.tileSeq[i][j]);
+            }
+        }
+    
+        // Count inversions
+        for (let i = 0; i < this.size * this.size; i++) {
+            for (let j = i + 1; j < this.size * this.size; j++) {
+                if (flattenedState[j] !== 0 && flattenedState[i] !== 0 && flattenedState[i] > flattenedState[j]) {
+                    inversions++;
+                }
+            }
+        }
+        return inversions;
     }
 
-    // Implement
     private calculateWalkingDistance(){
         if (this.goal === null) return 0;
-        return 1;
+        const size = this.size;
+        let walkingDistance = 0;
+      
+        // Create a grid to store the walking distances
+        const distanceGrid = Array.from({ length: size }, () => Array(size).fill(0));
+      
+        for (let row = 0; row < size; row++) {
+          for (let col = 0; col < size; col++) {
+            const value = this.tileSeq[row][col];
+            
+            // Calculate walking distance for non-empty tiles
+            if (value !== 0) {
+              const targetRow = Math.floor((value - 1) / size);
+              const targetCol = (value - 1) % size;
+              
+              // Calculate the Manhattan-like walking distance for the tile
+              distanceGrid[row][col] = Math.abs(row - targetRow) + Math.abs(col - targetCol);
+            }
+          }
+        }
+      
+        // Sum up the walking distances for all tiles
+        for (let row = 0; row < size; row++) {
+          for (let col = 0; col < size; col++) {
+            walkingDistance += distanceGrid[row][col];
+          }
+        }
+      
+        return walkingDistance;
     }
 
-    // Implement
-    private calculateLinearConflict(){
-        if (this.goal === null) return 0;
-        return 1;
+    private calculateLinearConflict() {
+        let conflict = 0;
+
+        // Row conflicts
+        for (let row = 0; row < this.size; row++) {
+            let maxVal = -1;
+            for (let col = 0; col < this.size; col++) {
+                const value = this.tileSeq[row][col];
+                if (value !== 0 && Math.floor((value - 1) / this.size) === row) {
+                    if (value > maxVal) {
+                        maxVal = value;
+                    } else {
+                        conflict += 2;
+                    }
+                }
+            }
+        }
+
+        // Column conflicts
+        for (let col = 0; col < this.size; col++) {
+            let maxVal = -1;
+            for (let row = 0; row < this.size; row++) {
+                const value = this.tileSeq[row][col];
+                if (value !== 0 && (value - 1) % this.size === col) {
+                    if (value > maxVal) {
+                        maxVal = value;
+                    } else {
+                        conflict += 2;
+                    }
+                }
+            }
+        }
+
+        return conflict;
     }
 
-    // Implement
     private calculateManhattanDistanceAndDepth(){
         if (this.goal === null) return 0;
         return this.calculateManhattanDistance() + this.depth;
@@ -185,7 +259,7 @@ export class State{
             childStates.push(rightChild);
         }
         if (this.parent !== undefined && this.parent !== null){
-            childStates.filter((child) => !child.equals(this.parent));
+            childStates = childStates.filter((child) => !child.equals(this.parent))
         }
 
         return childStates
@@ -205,11 +279,6 @@ export class State{
     }
 
     public checkInclusive(open : PriorityQueue, closed : State[]){
-        //Should check if the current state is located within the open or closed lists and return a tuple with the flag code and the corresponding state index if necessary
-        //Flag -1 --- State exists at a lower depth in closed or open
-        //Flag 0  --- No issues
-        //Flag 1  --- State exists at a higher depth in open, return equivalent state's depth
-        //Flag 2  --- State exists at a higher depth in closed, return equivalent state's index
         for (let i = 0; i < open.size(); i++){
             if (this.equals(open.at(i))){
                 if (this.depth > open.at(i).depth) return [-1,-1]
@@ -226,172 +295,4 @@ export class State{
             
         return [0,-1]
     }
-
-
-
-
-    /* public calculateCost(heuristic: string) {
-        switch (heuristic) {
-            case "MISPLACED":
-                this.misplacedHeuristic();
-                this.cost = this.misplaced;
-                break;
-            case "MANHATTAN":
-                this.manhattanHeuristic();
-                this.cost = this.manhattanDistance;
-                break;
-            case "INVERSIONS":
-                this.inversionHeuristic();
-                this.cost = this.inversions;
-                break;
-            case "WALKING DISTANCE":
-                this.walkingDistanceHeuristic();
-                this.cost = this.walkingDistance;
-                break;
-            case "MISPLACED AND DEPTH":
-                this.misplacedHeuristic();
-                this.cost = this.misplaced + this.depth;
-                break;
-            case "MANHATTAN AND DEPTH":
-                this.manhattanHeuristic();
-                this.cost = this.manhattanDistance + this.depth;
-                break;
-            case "WALKING DISTANCE AND DEPTH":
-                this.walkingDistanceHeuristic();
-                this.cost = this.walkingDistance + this.depth;
-                break;
-            case "WALKING DISTANCE AND MANHATTAN":
-                this.walkingDistanceHeuristic();
-                this.manhattanHeuristic();
-                this.cost = this.walkingDistance + this.manhattanDistance;
-                break;
-            case "MANHATTAN AND LINEAR CONFLICT":
-                this.linearConflictHeuristic();
-                this.manhattanHeuristic();
-                this.cost = this.manhattanDistance + this.linearConflict;
-                break;
-            case "ALL":
-                this.misplacedHeuristic();
-                this.manhattanHeuristic();
-                this.linearConflictHeuristic();
-                this.inversionHeuristic();
-                this.walkingDistanceHeuristic();
-                this.cost = this.misplaced + this.manhattanDistance + this.linearConflict + this.inversions + this.manhattanDistance + this.depth;
-                break;
-        }
-    }
-    
-    private misplacedHeuristic() {
-        let misplaced = 0;
-        let size = this.tileSeq.length;
-        for (let i = 0; i < size; i++) {
-            for (let j = 0; j < size; j++) {
-                if (this.tileSeq[i][j] !== ((size * i) + (j + 1)) % (size * size)) {
-                    misplaced++;
-                }
-            }
-        }
-        this.misplaced = misplaced;
-    }
-    
-    private manhattanHeuristic() {
-        let size = this.tileSeq.length;
-        let goal = [];
-        let a = [];
-        for (let i = 0; i < size; i++) {
-            for (let j = 0; j < size; j++) {
-                goal.push(((size * (i + 1)) + (j + 1) - size) % (size * size));
-            }
-        }
-    
-        for (let i = 0; i < size; i++) {
-            for (let j = 0; j < this.tileSeq[i].length; j++) {
-                a.push(this.tileSeq[i][j]);
-            }
-        }
-    
-        this.manhattanDistance = a.reduce((sum, val, idx) => {
-            const b = a.indexOf(val);
-            const g = goal.indexOf(val);
-            return sum + Math.abs(b % size - g % size) + Math.abs(Math.floor(b / size) - Math.floor(g / size));
-        }, 0);
-    }
-    
-    private linearConflict(state, goalState) {
-        let conflictCount = 0;
-        let manhattan = manhattanDistance(state, goalState); // Start with Manhattan Distance
-        
-        // Check rows for linear conflicts
-        for (let row = 0; row < state.length; row++) {
-          for (let col1 = 0; col1 < state[row].length; col1++) {
-            for (let col2 = col1 + 1; col2 < state[row].length; col2++) {
-              const tile1 = state[row][col1];
-              const tile2 = state[row][col2];
-              if (tile1 !== 0 && tile2 !== 0 && this.isInCorrectRowAndConflict(tile1, tile2, goalState)) {
-                conflictCount++;
-              }
-            }
-          }
-        }
-      
-        // Check columns for linear conflicts
-        for (let col = 0; col < state[0].length; col++) {
-          for (let row1 = 0; row1 < state.length; row1++) {
-            for (let row2 = row1 + 1; row2 < state.length; row2++) {
-              const tile1 = state[row1][col];
-              const tile2 = state[row2][col];
-              if (tile1 !== 0 && tile2 !== 0 && this.isInCorrectColumnAndConflict(tile1, tile2, goalState)) {
-                conflictCount++;
-              }
-            }
-          }
-        }
-        
-        return manhattan + 2 * conflictCount; // Add double the number of conflicts to the Manhattan distance
-    }
-      
-    private isInCorrectRowAndConflict(tile1, tile2, goalState) {
-        const goalPos1 = findTilePosition(tile1, goalState);
-        const goalPos2 = findTilePosition(tile2, goalState);
-        return goalPos1.row === goalPos2.row && goalPos1.col > goalPos2.col;
-    }
-      
-    private isInCorrectColumnAndConflict(tile1, tile2, goalState) {
-        const goalPos1 = findTilePosition(tile1, goalState);
-        const goalPos2 = findTilePosition(tile2, goalState);
-        return goalPos1.col === goalPos2.col && goalPos1.row > goalPos2.row;
-    }
-      
-    private walkingDistanceHeuristic(state) {
-        const size = state.length;
-        let walkingDistance = 0;
-      
-        // Create a grid to store the walking distances
-        const distanceGrid = Array.from({ length: size }, () => Array(size).fill(0));
-      
-        for (let row = 0; row < size; row++) {
-          for (let col = 0; col < size; col++) {
-            const value = state[row][col];
-            
-            // We only calculate the walking distance for non-empty tiles
-            if (value !== 0) {
-              const targetRow = Math.floor((value - 1) / size);
-              const targetCol = (value - 1) % size;
-              
-              // Calculate the Manhattan-like walking distance for the tile
-              distanceGrid[row][col] = Math.abs(row - targetRow) + Math.abs(col - targetCol);
-            }
-          }
-        }
-      
-        // Sum up the walking distances for all tiles
-        for (let row = 0; row < size; row++) {
-          for (let col = 0; col < size; col++) {
-            walkingDistance += distanceGrid[row][col];
-          }
-        }
-      
-        return walkingDistance;
-    } */
-    
 }

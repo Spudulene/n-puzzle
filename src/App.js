@@ -17,10 +17,8 @@ function App() {
 
   const game = new Game(size)
   game.startGame();
-  const solver = new PuzzleSolver(game, "MANHATTAN AND DEPTH")
+  const solver = new PuzzleSolver(game, "WALKING DISTANCE")
   //solver.solve();
-
-
 
   const handleChangeN = (newVal) =>{
     const num = Number(newVal)
