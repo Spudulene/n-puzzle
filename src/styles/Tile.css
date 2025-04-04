@@ -1,9 +1,15 @@
 .tile{
-    height: 20px;
-    width: 20px;
-    text-align: center;
+    height: 100%;
+    width: 100%;
+    color: #010B19;
+    font-size: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #89043D;
+    box-sizing: border-box;
 }
 
 .empty{
-    background: grey;
+    background: #717C89;
 }

@@ -1,7 +1,24 @@
 .board{
-    height: 100px;
-    width: 100px;
+    height: 400px;
+    width: 400px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    background: #F6F4F3;
+    border-radius: 10px;
+    margin-top: 20px;
+    border: 2px solid #89043D;
+    overflow: hidden;
+
+    div:first-of-type{
+        div{
+            border-top: none;
+        }
+    }
+
+    div:last-of-type{
+        div{
+            border-bottom: none;
+        }
+    }
 }

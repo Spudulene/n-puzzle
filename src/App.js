@@ -39,13 +39,12 @@ function App() {
 
   return (
     <>
-      <span>Current Board size: {size} x {size}</span>
+      {/* <span>Current Board size: {size} x {size}</span>
       <input onChange={(event) =>handleChangeN(event.target.value)}></input>
       <div ref={errorRef} style={{display:"none"}}>Board must be 3x3 or larger</div>
-      <button /* onClick={() => solver.solve()} */>CLICK HERE TO START SOLVING</button>
+      <button onClick={() => solver.solve()}>CLICK HERE TO START SOLVING</button> */}
       <input placeholder="new state" onChange={(event)=>setTest(event.target.value)}></input>
       <button onClick={()=>{game.move(eval(test)); setState(game.currentState); setTiles(game.currentTileSeq)}}>Set State</button>
-      {test}
       <Board state={tiles}/>
     </>
   );
