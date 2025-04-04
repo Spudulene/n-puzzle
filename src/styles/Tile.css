@@ -1,0 +1,9 @@
+.tile{
+    height: 20px;
+    width: 20px;
+    text-align: center;
+}
+
+.empty{
+    background: grey;
+}

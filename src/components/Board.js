@@ -1,19 +1,13 @@
 import React from "react";
-import Tile from "./Tile";
+import Row from "./Row";
 import "../styles/Board.css";
 
-const Board = ({ startState, onTileClick }) => {
+const Board = ({ state, onTileClick}) => {
   return (
     <div className="board">
-      {startState.map((row, rowIndex) =>
-        row.map((tile, colIndex) => (
-          <Tile
-            key={`${rowIndex}-${colIndex}`}
-            value={tile}
-            onClick={() => onTileClick(rowIndex, colIndex)}
-          />
-        ))
-      )}
+        {state.map((row, rowIndex) =>
+        <Row row={row} rowIndex={rowIndex} onTileClick={onTileClick}/>
+        )}
     </div>
   );
 };

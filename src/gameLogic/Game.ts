@@ -4,9 +4,17 @@ export class Game{
     public size : number;
     public start : State;
     public goal : State;
+    public currentState : State;
+    public currentTileSeq : number[][];
 
     constructor(size : number){
         this.size = size;
+
+        this.generateGoalBoard();
+        this.generateStartBoard();
+        while (!this.isSolvable()){
+            this.generateStartBoard()
+        }
     }
 
     private generateStartBoard() {
@@ -23,6 +31,8 @@ export class Game{
         }
     
         this.start = new State(startState,0, null, this.goal)
+        this.currentState = this.start;
+        this.currentTileSeq = this.start.tileSeq;
     }
 
     private generateGoalBoard() {
@@ -37,7 +47,7 @@ export class Game{
         this.goal = new State(goalState, 0, null, null)
     }
     
-    //TODO
+    // IF WE EXPAND FROM 3X3 TO NXN
     private isSolvableEven(){
 
     }
@@ -84,12 +94,8 @@ export class Game{
         return k
     }
 
-    // give parameter for AI game vs human game??
-    public startGame(){
-        this.generateGoalBoard();
-        this.generateStartBoard();
-        while (!this.isSolvable()){
-            this.generateStartBoard()
-        }
+    public move(tileSeq){
+        this.currentState = new State(tileSeq, this.currentState.depth + 1, this.currentState, this.goal)
+        this.currentTileSeq = this.currentState.tileSeq;
     }
 }
