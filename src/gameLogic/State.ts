@@ -5,9 +5,11 @@ export class State{
     public tileSeq : number[][];
     public depth : number;
     public parent : State | null;
+    public emptyPos : number[];
     private goal: State | null;
     private cost : number;
     private size : number;
+    
 
     public constructor(tileSeq : number[][], depth: number, parent: State | null, goal: State | null){
         this.tileSeq = tileSeq;
@@ -15,6 +17,7 @@ export class State{
         this.parent = parent;
         this.goal = goal;
         this.size = tileSeq.length;
+        this.findEmptyTile()
     }
 
     public equals (other: State | null){
@@ -294,5 +297,14 @@ export class State{
         })
             
         return [0,-1]
+    }
+
+    public findEmptyTile(){
+        let flattened : number[] = [];
+
+        // Flatten the start state
+        flattened = this.tileSeq.flat();
+
+        this.emptyPos = [Math.floor(flattened.indexOf(0) / this.size) ,flattened.indexOf(0) % this.size]
     }
 }

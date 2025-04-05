@@ -6,6 +6,7 @@ export class Game{
     public goal : State;
     public currentState : State;
     public currentTileSeq : number[][];
+    public completed =false;
 
     constructor(size : number){
         this.size = size;
@@ -56,19 +57,15 @@ export class Game{
         // Solvable if the number of inversions is even
         let inversions = 0;
         let emptyValue = 0;
-        let temp : number[] = [];
+        let flattened : number[] = [];
 
         // Flatten the start state
-        for (let i = 0; i < this.size; i++) {
-            for (let j = 0; j < this.size; j++) {
-                temp.push(this.start.tileSeq[i][j]);
-            }
-        }
-    
+        flattened = this.start.tileSeq.flat();
+
         // Count inversions
         for (let i = 0; i < this.size * this.size; i++) {
             for (let j = i + 1; j < this.size * this.size; j++) {
-                if (temp[j] !== emptyValue && temp[i] !== emptyValue && temp[i] > temp[j]) {
+                if (flattened[j] !== emptyValue && flattened[i] !== emptyValue && flattened[i] > flattened[j]) {
                     inversions++;
                 }
             }
@@ -94,8 +91,12 @@ export class Game{
         return k
     }
 
-    public move(tileSeq){
+    public move(tileSeq : number[][]){
         this.currentState = new State(tileSeq, this.currentState.depth + 1, this.currentState, this.goal)
         this.currentTileSeq = this.currentState.tileSeq;
+        if (this.currentState.equals(this.goal)){
+            this.completed = true;
+        }
     }
+
 }

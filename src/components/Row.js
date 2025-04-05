@@ -2,14 +2,15 @@ import React from "react";
 import Tile from "./Tile";
 import "../styles/Row.css";
 
-const Row = ({row, rowIndex}) => {
+const Row = ({row, rowIndex, onTileClick}) => {
   return (
     <div className="row">
         {row.map((tile, colIndex) => (
             <Tile
                 key={`${rowIndex}-${colIndex}`}
                 value={tile}
-            //onClick={() => onTileClick(rowIndex, colIndex)}
+                position={[rowIndex,colIndex]}
+                onClick={()=>onTileClick([rowIndex,colIndex])}
             />
         ))}
     </div>
