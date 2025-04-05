@@ -1,6 +1,5 @@
-import { Game } from "./Game.ts"
 import { PriorityQueue } from "./PriorityQueue.js";
-// PUT IN RETURN VALUES (PARAMS) : RETURN TYPE
+
 export class State{
     public tileSeq : number[][];
     public depth : number;
@@ -92,17 +91,19 @@ export class State{
         let size = this.tileSeq.length;
         let flattenedGoal : number[] = [];
         let flattenedState : number[] = [];
-        for (let i = 0; i < size; i++) {
+        if (this.goal) flattenedGoal = this.goal?.tileSeq.flat()
+        /* for (let i = 0; i < size; i++) {
             for (let j = 0; j < size; j++) {
                 flattenedGoal.push(((size * (i + 1)) + (j + 1) - size) % (size * size));
             }
-        }
-    
-        for (let i = 0; i < size; i++) {
+        } */
+
+        flattenedState = this.tileSeq.flat()
+        /* for (let i = 0; i < size; i++) {
             for (let j = 0; j < this.tileSeq[i].length; j++) {
                 flattenedState.push(this.tileSeq[i][j]);
             }
-        }
+        } */
         
         return flattenedState.reduce((sum, val, idx) => {
             const b = flattenedState.indexOf(val);
@@ -115,11 +116,12 @@ export class State{
         let inversions = 0;
         let flattenedState : number[] = [];
         // Flatten the start state
-        for (let i = 0; i < this.size; i++) {
+        flattenedState = this.tileSeq.flat()
+        /* for (let i = 0; i < this.size; i++) {
             for (let j = 0; j < this.tileSeq[i].length; j++) {
                 flattenedState.push(this.tileSeq[i][j]);
             }
-        }
+        } */
     
         // Count inversions
         for (let i = 0; i < this.size * this.size; i++) {

@@ -48,9 +48,23 @@ export class Game{
         this.goal = new State(goalState, 0, null, null)
     }
     
-    // IF WE EXPAND FROM 3X3 TO NXN
     private isSolvableEven(){
+        let inversions = 0;
+        let emptyValue = 0;
+        let flattened : number[] = [];
 
+        // Flatten the start state
+        flattened = this.start.tileSeq.flat();
+        for (let i = 0; i < this.size * this.size; i++) {
+            for (let j = i + 1; j < this.size * this.size; j++) {
+                if (flattened[j] !== emptyValue && flattened[i] !== emptyValue && flattened[i] > flattened[j]) {
+                    inversions++;
+                }
+            }
+        }
+
+        // if blank is on even row and inversions are odd or if blank is on odd row and inversions are even
+        return (this.start.emptyPos[0] % 2 == 0 && inversions % 2 == 1) || (this.start.emptyPos[0] % 2 == 1 && inversions % 2 == 0) 
     }
 
     private isSolvableOdd(){

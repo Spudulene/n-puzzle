@@ -8,16 +8,16 @@ const { PuzzleSolver } = require("./gameLogic/PuzzleSolver.ts")
 const { Game } = require("./gameLogic/Game.ts")
 
 function App() {
+
   const [size, setSize] = useState(3)
   const [moves, setMoves] = useState(0)
-  const [test, setTest] = useState(null)
+
+  const [game, setGame] = useState(null)
   const [state, setState] = useState(null)
   const [tiles, setTiles] = useState(null)
-  const [game, setGame] = useState(null)
   const [emptyPos, setEmptyPos] = useState(null)
   const [completed, setCompleted] = useState(false)
 
-  const errorRef = useRef()
   const hasRun = useRef()
 
   const constructor = () => {
@@ -29,6 +29,17 @@ function App() {
     setTiles(game.currentTileSeq)
     setEmptyPos(game.currentState.emptyPos)
   }
+
+  useEffect(()=>{
+    console.log(size)
+    const newGame = new Game(size)
+    setGame(newGame)
+    setState(newGame.currentState)
+    setTiles(newGame.currentTileSeq)
+    setEmptyPos(newGame.currentState.emptyPos)
+    setMoves(newGame.currentState.depth)
+    setCompleted(newGame.completed)
+  },[size])
 
   useEffect(()=>{
     if(completed) {
@@ -46,21 +57,6 @@ function App() {
   },[completed])
 
   //const solver = new PuzzleSolver(game, "WALKING DISTANCE")
-
-  const handleChangeN = (newVal) =>{
-    const num = Number(newVal)
-    if (newVal.trim() === ""){
-      setSize(3)
-      errorRef.current.style = "display: none"
-    }
-    else if (num < 3 || !Number.isInteger(num)){
-      errorRef.current.style = ""
-    }
-    else{
-      setSize(num)
-      errorRef.current.style = "display: none"
-    }
-  }
 
   const validateMove = (clickedTilePos) =>{
     return (clickedTilePos[0] == emptyPos[0]-1 && clickedTilePos[1] == emptyPos[1]) ||
@@ -89,44 +85,13 @@ function App() {
     } 
   }
 
-  function AdjustingInterval(workFunc, interval, errorFunc) {
-    var that = this;
-    var expected, timeout;
-    this.interval = interval;
-
-    this.start = function() {
-        expected = Date.now() + this.interval;
-        timeout = setTimeout(step, this.interval);
-    }
-
-    this.stop = function() {
-        clearTimeout(timeout);
-    }
-
-    function step() {
-      var drift = Date.now() - expected;
-      if (drift > that.interval) {
-          // You could have some default stuff here too...
-          if (errorFunc) errorFunc();
-      }
-      workFunc();
-      expected += that.interval;
-      timeout = setTimeout(step, Math.max(0, that.interval-drift));
-    }
-}
-
-tick(); // initial call to kick things off
-
   constructor();
-
-  console.log(moves)
 
   return (
     <div className="content">
-      {/* <span>Current Board size: {size} x {size}</span>
-      <input onChange={(event) =>handleChangeN(event.target.value)}></input>
-      <div ref={errorRef} style={{display:"none"}}>Board must be 3x3 or larger</div>
-      <button onClick={() => solver.solve()}>CLICK HERE TO START SOLVING</button> */}
+      <span>Choose a board size: </span>
+      <input type="number" min="3" max="6" value={size} onChange={(event) =>setSize(Number(event.target.value))}></input>
+      {/* <button onClick={() => solver.solve()}>CLICK HERE TO START SOLVING</button> */}
       <Board state={tiles} onTileClick={handleMove}/>
       <div>Moves: {moves}</div>
     </div>
