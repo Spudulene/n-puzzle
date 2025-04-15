@@ -10,14 +10,20 @@ const { Game } = require("./gameLogic/Game.ts")
 function App() {
   const [size, setSize] = useState(3)
   const [moves, setMoves] = useState(0)
-
+  
   const [game, setGame] = useState(null)
+  const [copy, setCopy] = useState(null)
   const [state, setState] = useState(null)
   const [tiles, setTiles] = useState(null)
   const [emptyPos, setEmptyPos] = useState(null)
   const [completed, setCompleted] = useState(false)
+
   const [AISolutionPath, setAISolutionPath] = useState(null)
-  const [AISolving, setAISolving] = useState(false);
+  const [AISolving, setAISolving] = useState(false)
+
+  const [time, setTime] = useState(0)
+  const [timerActive, setTimerActive] = useState(false)
+  const intervalRef = useRef(null)
 
   const hasRun = useRef()
 
@@ -36,26 +42,36 @@ function App() {
   useEffect(()=>{
     const newGame = new Game(size)
     setGame(newGame)
+    setCopy(newGame.clone())
     setState(newGame.currentState)
     setTiles(newGame.currentTileSeq)
     setEmptyPos(newGame.currentState.emptyPos)
     setMoves(newGame.currentState.depth)
     setCompleted(newGame.completed)
+
+    setTime(0)
+    clearInterval(intervalRef.current)
+    setTimerActive(false)
   },[size])
 
   // if the use completes the puzzle, give them a new one
   useEffect(()=>{
     if(completed) {
       setTimeout(() => {
-        window.alert(`Congratulations, you solved the puzzle in ${moves} moves. Here's a new one.`)
+        window.alert(`Congratulations, you solved the puzzle in ${time} using ${moves} moves. Here's a new one.`)
         const newGame = new Game(size)
         setGame(newGame)
+        setCopy(newGame.clone())
         setState(newGame.currentState)
         setTiles(newGame.currentTileSeq)
         setEmptyPos(newGame.currentState.emptyPos)
         setMoves(newGame.currentState.depth)
         setCompleted(newGame.completed)
       }, 500)
+
+      setTime(0)
+      clearInterval(intervalRef.current)
+      setTimerActive(false)
     }
   },[completed])
 
@@ -79,6 +95,14 @@ function App() {
   }
 
   const handleMove = (clickedTilePos) => {
+
+    if (!timerActive) {
+      setTimerActive(true);
+      intervalRef.current = setInterval(() => {
+        setTime(prev => prev + 1);
+      }, 1000);
+    }
+
     if (validateMove(clickedTilePos)){
       let tempTiles = [];
       tiles.forEach((row, rowIndex) => {
@@ -108,7 +132,35 @@ function App() {
     })
   }
 
-  //TODO create reset button, create shuffle button, create timer, give users the ability to upload images
+  const handleShuffle = () => {
+    const newGame = new Game(size)
+    setGame(newGame)
+    setState(newGame.currentState)
+    setTiles(newGame.currentTileSeq)
+    setEmptyPos(newGame.currentState.emptyPos)
+    setMoves(newGame.currentState.depth)
+    setCompleted(newGame.completed)
+
+    setTime(0);
+    clearInterval(intervalRef.current);
+    setTimerActive(false);
+  }
+
+  const handleReset = () => {
+    const newGame = copy.clone(); // create a fresh clone again
+    setGame(newGame);
+    setState(newGame.currentState);
+    setTiles(newGame.currentTileSeq);
+    setEmptyPos(newGame.currentState.emptyPos);
+    setMoves(newGame.currentState.depth);
+    setCompleted(newGame.completed);
+
+    setTime(0)
+    clearInterval(intervalRef.current)
+    setTimerActive(false)
+  }
+
+  //TODO give users the ability to upload images
 
   constructor();
 
@@ -116,9 +168,12 @@ function App() {
     <div className="content">
       <span>Choose a board size: </span>
       <input type="number" min="3" max="6" value={size} onChange={(event) =>setSize(Number(event.target.value))}></input>
-      <button disabled={size != 3 || AISolving} onClick={() => handleSolve()}>CLICK HERE TO START SOLVING</button>
+      <button disabled={size != 3 || AISolving} onClick={handleSolve}>CLICK HERE TO START SOLVING</button>
+      <button onClick={handleShuffle}>Shuffle</button>
+      <button onClick={handleReset}>Reset</button>
       <Board state={tiles} onTileClick={handleMove}/>
       <div>Moves: {moves}</div>
+      <div>Time: {time}s</div>
     </div>
   );
 }

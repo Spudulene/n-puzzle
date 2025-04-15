@@ -6,7 +6,7 @@ export class Game{
     public goal : State;
     public currentState : State;
     public currentTileSeq : number[][];
-    public completed =false;
+    public completed = false;
 
     constructor(size : number){
         this.size = size;
@@ -99,5 +99,15 @@ export class Game{
             this.completed = true;
         }
     }
+
+    public clone() {
+        const clonedGame = new Game(this.size);
+        clonedGame.start = JSON.parse(JSON.stringify(this.start));
+        clonedGame.goal = JSON.parse(JSON.stringify(this.goal));
+        clonedGame.currentState = JSON.parse(JSON.stringify(this.currentState));
+        clonedGame.currentTileSeq = JSON.parse(JSON.stringify(this.currentTileSeq));
+        clonedGame.completed = this.completed;
+        return clonedGame;
+      }
 
 }
