@@ -32,11 +32,6 @@ export class State{
         return true;
     }
 
-    public printState() {
-        const state = this.tileSeq.map((d) => d.join(" ")).join("\n")
-        console.log(state)
-    }
-
     // MISPLACED ALONE
     // MANHATTAN DISTANCE ALONE
     // INVERSION COUNT ALONE
@@ -92,18 +87,8 @@ export class State{
         let flattenedGoal : number[] = [];
         let flattenedState : number[] = [];
         if (this.goal) flattenedGoal = this.goal?.tileSeq.flat()
-        /* for (let i = 0; i < size; i++) {
-            for (let j = 0; j < size; j++) {
-                flattenedGoal.push(((size * (i + 1)) + (j + 1) - size) % (size * size));
-            }
-        } */
 
         flattenedState = this.tileSeq.flat()
-        /* for (let i = 0; i < size; i++) {
-            for (let j = 0; j < this.tileSeq[i].length; j++) {
-                flattenedState.push(this.tileSeq[i][j]);
-            }
-        } */
         
         return flattenedState.reduce((sum, val, idx) => {
             const b = flattenedState.indexOf(val);
@@ -117,11 +102,6 @@ export class State{
         let flattenedState : number[] = [];
         // Flatten the start state
         flattenedState = this.tileSeq.flat()
-        /* for (let i = 0; i < this.size; i++) {
-            for (let j = 0; j < this.tileSeq[i].length; j++) {
-                flattenedState.push(this.tileSeq[i][j]);
-            }
-        } */
     
         // Count inversions
         for (let i = 0; i < this.size * this.size; i++) {

@@ -92,19 +92,6 @@ export class Game{
         return this.size % 2 == 1 ? this.isSolvableOdd() : this.isSolvableEven()
     }
 
-    public printPath(board: State | null, recursions: number){
-        if (board === null) return;
-        let k : number | undefined;
-        if (board.parent === null) {
-            board.printState();
-            return recursions;
-        }
-
-        k = this.printPath(board.parent,recursions+1)
-        board.printState()
-        return k
-    }
-
     public move(tileSeq : number[][]){
         this.currentState = new State(tileSeq, this.currentState.depth + 1, this.currentState, this.goal)
         this.currentTileSeq = this.currentState.tileSeq;

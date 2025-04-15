@@ -8,7 +8,6 @@ const { PuzzleSolver } = require("./gameLogic/PuzzleSolver.ts")
 const { Game } = require("./gameLogic/Game.ts")
 
 function App() {
-
   const [size, setSize] = useState(3)
   const [moves, setMoves] = useState(0)
 
@@ -17,9 +16,12 @@ function App() {
   const [tiles, setTiles] = useState(null)
   const [emptyPos, setEmptyPos] = useState(null)
   const [completed, setCompleted] = useState(false)
+  const [AISolutionPath, setAISolutionPath] = useState(null)
+  const [AISolving, setAISolving] = useState(false);
 
   const hasRun = useRef()
 
+  // initally create 3x3 board
   const constructor = () => {
     if (hasRun.current) return
     hasRun.current = true
@@ -30,8 +32,8 @@ function App() {
     setEmptyPos(game.currentState.emptyPos)
   }
 
+  // whenever the user changes the size, create a new game
   useEffect(()=>{
-    console.log(size)
     const newGame = new Game(size)
     setGame(newGame)
     setState(newGame.currentState)
@@ -41,6 +43,7 @@ function App() {
     setCompleted(newGame.completed)
   },[size])
 
+  // if the use completes the puzzle, give them a new one
   useEffect(()=>{
     if(completed) {
       setTimeout(() => {
@@ -56,7 +59,17 @@ function App() {
     }
   },[completed])
 
-  //const solver = new PuzzleSolver(game, "WALKING DISTANCE")
+  useEffect(()=>{
+    if(AISolutionPath){
+      Promise.resolve(
+        AISolutionPath.forEach((gameState, i) => {
+          setTimeout(()=>{
+            setTiles(gameState.tileSeq)
+          }, i * 1000);
+        })
+      ).then(setAISolving(false))
+    }
+  },[AISolutionPath])
 
   const validateMove = (clickedTilePos) =>{
     return (clickedTilePos[0] == emptyPos[0]-1 && clickedTilePos[1] == emptyPos[1]) ||
@@ -85,13 +98,25 @@ function App() {
     } 
   }
 
+  const handleSolve = () => {
+    setAISolving(true);
+    let solutionPath = new PuzzleSolver(game, "MANHATTAN DISTANCE").solve();
+    solutionPath.forEach((gameState, i) => {
+      setTimeout(()=>{
+        setTiles(gameState.tileSeq)
+      }, i * 1000);
+    })
+  }
+
+  //TODO create reset button, create shuffle button, create timer, give users the ability to upload images
+
   constructor();
 
   return (
     <div className="content">
       <span>Choose a board size: </span>
       <input type="number" min="3" max="6" value={size} onChange={(event) =>setSize(Number(event.target.value))}></input>
-      {/* <button onClick={() => solver.solve()}>CLICK HERE TO START SOLVING</button> */}
+      <button disabled={size != 3 || AISolving} onClick={() => handleSolve()}>CLICK HERE TO START SOLVING</button>
       <Board state={tiles} onTileClick={handleMove}/>
       <div>Moves: {moves}</div>
     </div>

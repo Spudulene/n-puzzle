@@ -24,20 +24,26 @@ export class PuzzleSolver{
         let children : State[];
         this.start.calculateCost(this.heuristic);
         this.pq.put(this.start);
+        let solutionPath : State[] = [];
 
         while (!this.pq.empty()){
-            console.log(this.pq)
             min = this.pq.get()
             if (min.equals(this.goal)) {
-                return this.game.printPath(min,0)
+                let currentState = min;
+                while (currentState.parent != null){
+                    solutionPath.push(currentState);
+                    currentState = currentState.parent;
+                }
+                
+                return solutionPath.reverse();
             }
             
             else{
                 this.closed.push(min);
-                children = min.generateChildren()
-                //children = children.sort(() => Math.random() - 0.5);
+                children = min.generateChildren();
+                children = children.sort(() => Math.random() - 0.5);
                 children.forEach((child) =>{
-                    flag = child.checkInclusive(this.pq, this.closed)
+                    flag = child.checkInclusive(this.pq, this.closed);
                     switch (flag[0]){
                         case 0:
                             child.calculateCost(this.heuristic);
