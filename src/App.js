@@ -18,10 +18,9 @@ function App() {
   const [emptyPos, setEmptyPos] = useState(null)
   const [completed, setCompleted] = useState(false)
 
-  const [AISolutionPath, setAISolutionPath] = useState(null)
   const [AISolving, setAISolving] = useState(false)
 
-  const [time, setTime] = useState(0)
+  const [timeElapsed, setTimeElapsed] = useState(0)
   const [timerActive, setTimerActive] = useState(false)
   const intervalRef = useRef(null)
 
@@ -51,7 +50,7 @@ function App() {
     setMoves(newGame.currentState.depth)
     setCompleted(newGame.completed)
 
-    setTime(0)
+    setTimeElapsed(0)
     clearInterval(intervalRef.current)
     setTimerActive(false)
   },[size])
@@ -60,7 +59,7 @@ function App() {
   useEffect(()=>{
     if(completed) {
       setTimeout(() => {
-        window.alert(`Congratulations, you solved the puzzle in ${time} using ${moves} moves. Here's a new one.`)
+        window.alert(`Congratulations, you solved the puzzle in ${timeElapsed < 60 ? timeElapsed + "s": Math.floor(timeElapsed / 60) + "m " + timeElapsed % 60 + "s" } using ${moves} moves. Here's a new one.`)
         const newGame = new Game(size)
         setGame(newGame)
         setCopy(newGame.clone())
@@ -71,23 +70,18 @@ function App() {
         setCompleted(newGame.completed)
       }, 500)
 
-      setTime(0)
+      setTimeElapsed(0)
       clearInterval(intervalRef.current)
       setTimerActive(false)
     }
   },[completed])
 
-  useEffect(()=>{
-    if(AISolutionPath){
-      Promise.resolve(
-        AISolutionPath.forEach((gameState, i) => {
-          setTimeout(()=>{
-            setTiles(gameState.tileSeq)
-          }, i * 1000);
-        })
-      ).then(setAISolving(false))
+  const handleSetSize = (n) => {
+    console.log(n)
+    if (Number(n) <= 6 && n !== ""){
+      setSize(Number(n))
     }
-  },[AISolutionPath])
+  }
 
   const validateMove = (clickedTilePos) =>{
     return (clickedTilePos[0] == emptyPos[0]-1 && clickedTilePos[1] == emptyPos[1]) ||
@@ -101,7 +95,7 @@ function App() {
     if (!timerActive) {
       setTimerActive(true);
       intervalRef.current = setInterval(() => {
-        setTime(prev => prev + 1);
+        setTimeElapsed(prev => prev + 1);
       }, 1000);
     }
 
@@ -125,8 +119,6 @@ function App() {
   }
 
   const handleSolve = () => {
-    //setAISolving(true)
-    console.log(game)
     let solutionPath = new PuzzleSolver(game, "MANHATTAN DISTANCE").solve();
     solutionPath.forEach((gameState, i) => {
       setTimeout(()=>{
@@ -144,7 +136,7 @@ function App() {
     setMoves(newGame.currentState.depth)
     setCompleted(newGame.completed)
 
-    setTime(0);
+    setTimeElapsed(0);
     clearInterval(intervalRef.current);
     setTimerActive(false);
 
@@ -160,42 +152,47 @@ function App() {
     setMoves(newGame.currentState.depth);
     setCompleted(newGame.completed);
 
-    setTime(0)
+    setTimeElapsed(0)
     clearInterval(intervalRef.current)
     setTimerActive(false)
 
     setAISolving(false)
   }
 
-  const handleRemoveImage = () => {
+  const handleImageUpload = (e) =>{
+    if (e.target.files[0]) {
+      const imageUrl = URL.createObjectURL(e.target.files[0]);
+      setBackgroundImage(imageUrl);
+    }
+  }
+
+  const handleImageRemove = () => {
     setBackgroundImage(null)
   }
 
-  //TODO give users the ability to upload images
-
-  constructor();
+  constructor()
 
   return (
     <div className="content">
-      <span>Choose a board size: </span>
-      <input type="number" min="3" max="6" value={size} onChange={(event) =>setSize(Number(event.target.value))}></input>
-      <button disabled={size != 3 || AISolving} onClick={handleSolve}>CLICK HERE TO START SOLVING</button>
-      <button onClick={handleShuffle}>Shuffle</button>
-      <button onClick={handleReset}>Reset</button>
-      <Board state={tiles} onTileClick={handleMove} backgroundImage={backgroundImage}/>
-      <div>Moves: {moves}</div>
-      <div>Time: {time}s</div>
-      <input type="file" accept="image/*" 
-        onChange={(e) => {
-          if (e.target.files[0]) {
-            const imageUrl = URL.createObjectURL(e.target.files[0]);
-            setBackgroundImage(imageUrl);
-          }
-        }}
+      <Header />
+      <Controls
+        size={size}
+        setSize={handleSetSize}
+        onShuffle={handleShuffle}
+        onReset={handleReset}
+        onSolve={handleSolve}
+        onImageUpload={handleImageUpload}
+        onImageRemove={handleImageRemove}
+        disableAI={size !== 3 || AISolving}
       />
-      <button onClick={handleRemoveImage}>Remove Image</button>
+      <Board
+        state={tiles}
+        onTileClick={handleMove}
+        backgroundImage={backgroundImage}
+      />
+      <Footer moves={moves} time={timeElapsed}/>
     </div>
-  );
+  )
 }
 
 export default App;
