@@ -102,9 +102,9 @@ export class Game{
 
     public clone() {
         const clonedGame = new Game(this.size);
-        clonedGame.start = JSON.parse(JSON.stringify(this.start));
-        clonedGame.goal = JSON.parse(JSON.stringify(this.goal));
-        clonedGame.currentState = JSON.parse(JSON.stringify(this.currentState));
+        clonedGame.start = new State(this.start.tileSeq, 0, null, this.goal)
+        clonedGame.goal = new State(this.goal.tileSeq, 0 , null, null)
+        clonedGame.currentState = new State(this.start.tileSeq, 0, null, this.goal)
         clonedGame.currentTileSeq = JSON.parse(JSON.stringify(this.currentTileSeq));
         clonedGame.completed = this.completed;
         return clonedGame;

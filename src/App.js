@@ -25,6 +25,8 @@ function App() {
   const [timerActive, setTimerActive] = useState(false)
   const intervalRef = useRef(null)
 
+  const [backgroundImage, setBackgroundImage] = useState(null)
+
   const hasRun = useRef()
 
   // initally create 3x3 board
@@ -123,7 +125,8 @@ function App() {
   }
 
   const handleSolve = () => {
-    setAISolving(true);
+    //setAISolving(true)
+    console.log(game)
     let solutionPath = new PuzzleSolver(game, "MANHATTAN DISTANCE").solve();
     solutionPath.forEach((gameState, i) => {
       setTimeout(()=>{
@@ -144,6 +147,8 @@ function App() {
     setTime(0);
     clearInterval(intervalRef.current);
     setTimerActive(false);
+
+    setAISolving(false)
   }
 
   const handleReset = () => {
@@ -158,6 +163,12 @@ function App() {
     setTime(0)
     clearInterval(intervalRef.current)
     setTimerActive(false)
+
+    setAISolving(false)
+  }
+
+  const handleRemoveImage = () => {
+    setBackgroundImage(null)
   }
 
   //TODO give users the ability to upload images
@@ -171,9 +182,18 @@ function App() {
       <button disabled={size != 3 || AISolving} onClick={handleSolve}>CLICK HERE TO START SOLVING</button>
       <button onClick={handleShuffle}>Shuffle</button>
       <button onClick={handleReset}>Reset</button>
-      <Board state={tiles} onTileClick={handleMove}/>
+      <Board state={tiles} onTileClick={handleMove} backgroundImage={backgroundImage}/>
       <div>Moves: {moves}</div>
       <div>Time: {time}s</div>
+      <input type="file" accept="image/*" 
+        onChange={(e) => {
+          if (e.target.files[0]) {
+            const imageUrl = URL.createObjectURL(e.target.files[0]);
+            setBackgroundImage(imageUrl);
+          }
+        }}
+      />
+      <button onClick={handleRemoveImage}>Remove Image</button>
     </div>
   );
 }
