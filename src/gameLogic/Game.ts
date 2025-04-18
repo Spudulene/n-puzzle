@@ -108,6 +108,5 @@ export class Game{
         clonedGame.currentTileSeq = JSON.parse(JSON.stringify(this.currentTileSeq));
         clonedGame.completed = this.completed;
         return clonedGame;
-      }
-
+    }
 }

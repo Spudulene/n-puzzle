@@ -1,9 +1,9 @@
 import {useState, useRef, useEffect} from "react"
-import Board from "./components/Board";
-import Controls from "./components/Controls";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import "./styles/App.css";
+import Board from "./components/Board"
+import Controls from "./components/Controls"
+import Header from "./components/Header"
+import Footer from "./components/Footer"
+import "./styles/App.css"
 const { PuzzleSolver } = require("./gameLogic/PuzzleSolver.ts")
 const { Game } = require("./gameLogic/Game.ts")
 
@@ -93,22 +93,22 @@ function App() {
   const handleMove = (clickedTilePos) => {
 
     if (!timerActive) {
-      setTimerActive(true);
+      setTimerActive(true)
       intervalRef.current = setInterval(() => {
-        setTimeElapsed(prev => prev + 1);
-      }, 1000);
+        setTimeElapsed(prev => prev + 1)
+      }, 1000)
     }
 
     if (validateMove(clickedTilePos)){
-      let tempTiles = [];
+      let tempTiles = []
       tiles.forEach((row, rowIndex) => {
         tempTiles.push([])
         row.forEach(num =>{
           tempTiles[rowIndex].push(num)
         })
-      });
+      })
 
-      [tempTiles[emptyPos[0]][emptyPos[1]],tempTiles[clickedTilePos[0]][clickedTilePos[1]]] = [tempTiles[clickedTilePos[0]][clickedTilePos[1]],tempTiles[state.emptyPos[0]][state.emptyPos[1]]];
+      [tempTiles[emptyPos[0]][emptyPos[1]],tempTiles[clickedTilePos[0]][clickedTilePos[1]]] = [tempTiles[clickedTilePos[0]][clickedTilePos[1]],tempTiles[state.emptyPos[0]][state.emptyPos[1]]]
       game.move(tempTiles)
       setState(game.currentState)
       setTiles(game.currentTileSeq)
@@ -119,38 +119,40 @@ function App() {
   }
 
   const handleSolve = () => {
-    let solutionPath = new PuzzleSolver(game, "MANHATTAN DISTANCE").solve();
+    setAISolving(true)
+    let solutionPath = new PuzzleSolver(game, "WALKING DISTANCE").solve()
     solutionPath.forEach((gameState, i) => {
       setTimeout(()=>{
         setTiles(gameState.tileSeq)
-      }, i * 1000);
+      }, i * 1000)
     })
   }
 
   const handleShuffle = () => {
     const newGame = new Game(size)
     setGame(newGame)
+    setCopy(newGame.clone())
     setState(newGame.currentState)
     setTiles(newGame.currentTileSeq)
     setEmptyPos(newGame.currentState.emptyPos)
     setMoves(newGame.currentState.depth)
     setCompleted(newGame.completed)
 
-    setTimeElapsed(0);
-    clearInterval(intervalRef.current);
-    setTimerActive(false);
+    setTimeElapsed(0)
+    clearInterval(intervalRef.current)
+    setTimerActive(false)
 
     setAISolving(false)
   }
 
   const handleReset = () => {
-    const newGame = copy.clone(); // create a fresh clone again
-    setGame(newGame);
-    setState(newGame.currentState);
-    setTiles(newGame.currentTileSeq);
-    setEmptyPos(newGame.currentState.emptyPos);
-    setMoves(newGame.currentState.depth);
-    setCompleted(newGame.completed);
+    const newGame = copy.clone()
+    setGame(newGame)
+    setState(newGame.currentState)
+    setTiles(newGame.currentTileSeq)
+    setEmptyPos(newGame.currentState.emptyPos)
+    setMoves(newGame.currentState.depth)
+    setCompleted(newGame.completed)
 
     setTimeElapsed(0)
     clearInterval(intervalRef.current)
@@ -161,8 +163,8 @@ function App() {
 
   const handleImageUpload = (e) =>{
     if (e.target.files[0]) {
-      const imageUrl = URL.createObjectURL(e.target.files[0]);
-      setBackgroundImage(imageUrl);
+      const imageUrl = URL.createObjectURL(e.target.files[0])
+      setBackgroundImage(imageUrl)
     }
   }
 
@@ -195,4 +197,4 @@ function App() {
   )
 }
 
-export default App;
+export default App

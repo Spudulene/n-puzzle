@@ -33,3 +33,9 @@
   text-align: center;
   margin-left: .25rem;
 }
+
+button.disabled,
+button.disabled:hover{
+  background-color: #57839a;
+  cursor: not-allowed;
+}

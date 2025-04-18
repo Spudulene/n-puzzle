@@ -1,19 +1,19 @@
 body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #F6F4F3;
-    color: #010B2D;
-  }
-  
-  .content {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #F6F4F3;
+  color: #010B2D;
+}
+
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
 .main{
-    --text: #010B2D;
-    --background: #F6F4F3;
-    --primary: #2D5064;
-    --secondary: #717C89;
-    --accent: #89043D;
+  --text: #010B2D;
+  --background: #F6F4F3;
+  --primary: #2D5064;
+  --secondary: #717C89;
+  --accent: #89043D;
 }

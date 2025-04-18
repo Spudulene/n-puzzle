@@ -3,10 +3,10 @@ const Footer = ({ moves, time}) => {
     return(
         <footer className="footer">
             <div>Moves: {moves}</div>
-            <div>Time: 
+            <div>
                 {time < 60 ? 
-                `${time}s` : `
-                ${Math.floor(time / 60)}m ${time % 60}s`}
+                `Time: ${time}s` : 
+                `Time: ${Math.floor(time / 60)}m ${time % 60}s`}
             </div>
         </footer>
     )

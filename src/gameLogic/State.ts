@@ -32,13 +32,6 @@ export class State{
         return true;
     }
 
-    // MISPLACED ALONE
-    // MANHATTAN DISTANCE ALONE
-    // INVERSION COUNT ALONE
-    // WALKING DISTANCE ALONE
-    // MANHATTAN DISTANCE + DEPTH (A*)
-    // MANHATTAN DISTANCE + LINEAR CONFLICT
-
     public calculateCost(heuristic: string) {
         switch (heuristic) {
             // time: .5 sec. moves: 88
