@@ -1,7 +1,7 @@
 import { useRef } from "react";
 
 import "../styles/Controls.css"
-const Controls = ({ size, setSize, onShuffle, onReset, onSolve, onImageUpload, onImageRemove, disableAI}) => {
+const Controls = ({ size, setSize, onShuffle, onReset, onSolve, onImageUpload, onImageRemove, disableAI, AISolving}) => {
     const fileInputRef = useRef();
 
     const handleFileClick = () => {
@@ -15,8 +15,8 @@ const Controls = ({ size, setSize, onShuffle, onReset, onSolve, onImageUpload, o
             <input type="number" min="3" max="6" value={size} onChange={(e) =>setSize(e.target.value)}></input>
         </span>
         <button disabled={disableAI} onClick={onSolve} className={disableAI ? "disabled" : ""}>Solve using AI</button>
-        <button onClick={onShuffle}>Shuffle</button>
-        <button onClick={onReset}>Reset</button>
+        <button disabled={AISolving} onClick={onShuffle} className={AISolving ? "disabled" : ""}>Shuffle</button>
+        <button disabled={AISolving} onClick={onReset} className={AISolving ? "disabled" : ""}>Reset</button>
 
         <input
             type="file"

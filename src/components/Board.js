@@ -3,7 +3,7 @@ import Tile from "./Tile";
 import "../styles/Board.css";
 
 const Board = ({ state, onTileClick, backgroundImage }) => {
-  const size = state.length;
+  const size = Math.sqrt(state.length); // Since it's a 1D array now
 
   return (
     <div
@@ -13,15 +13,16 @@ const Board = ({ state, onTileClick, backgroundImage }) => {
         gridTemplateRows: `repeat(${size}, 1fr)`,
       }}
     >
-      {state.flat().map((value, index) => {
+      {state.map((value, index) => {
         const row = Math.floor(index / size);
         const col = index % size;
+
         return (
           <Tile
             key={`${row}-${col}`}
             value={value}
             position={[row, col]}
-            onClick={() => onTileClick([row, col])}
+            onClick={() => onTileClick(index)}
             backgroundImage={backgroundImage}
             gridSize={size}
           />
@@ -32,4 +33,3 @@ const Board = ({ state, onTileClick, backgroundImage }) => {
 };
 
 export default Board;
-

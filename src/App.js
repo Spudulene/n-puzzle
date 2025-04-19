@@ -4,8 +4,9 @@ import Controls from "./components/Controls"
 import Header from "./components/Header"
 import Footer from "./components/Footer"
 import "./styles/App.css"
-const { PuzzleSolver } = require("./gameLogic/PuzzleSolver.ts")
+const { Solver } = require("./Solver/Solver.ts")
 const { Game } = require("./gameLogic/Game.ts")
+
 
 function App() {
   const [size, setSize] = useState(3)
@@ -15,9 +16,9 @@ function App() {
   const [copy, setCopy] = useState(null)
   const [state, setState] = useState(null)
   const [tiles, setTiles] = useState(null)
-  const [emptyPos, setEmptyPos] = useState(null)
   const [completed, setCompleted] = useState(false)
 
+  const [disableAI, setDisableAI] = useState(false)
   const [AISolving, setAISolving] = useState(false)
 
   const [timeElapsed, setTimeElapsed] = useState(0)
@@ -35,8 +36,7 @@ function App() {
     const game = new Game(size)
     setGame(game)
     setState(game.currentState)
-    setTiles(game.currentTileSeq)
-    setEmptyPos(game.currentState.emptyPos)
+    setTiles(game.tiles)
   }
 
   // whenever the user changes the size, create a new game
@@ -45,8 +45,7 @@ function App() {
     setGame(newGame)
     setCopy(newGame.clone())
     setState(newGame.currentState)
-    setTiles(newGame.currentTileSeq)
-    setEmptyPos(newGame.currentState.emptyPos)
+    setTiles(newGame.tiles)
     setMoves(newGame.currentState.depth)
     setCompleted(newGame.completed)
 
@@ -64,8 +63,7 @@ function App() {
         setGame(newGame)
         setCopy(newGame.clone())
         setState(newGame.currentState)
-        setTiles(newGame.currentTileSeq)
-        setEmptyPos(newGame.currentState.emptyPos)
+        setTiles(newGame.tiles)
         setMoves(newGame.currentState.depth)
         setCompleted(newGame.completed)
       }, 500)
@@ -77,64 +75,84 @@ function App() {
   },[completed])
 
   const handleSetSize = (n) => {
-    console.log(n)
     if (Number(n) <= 6 && n !== ""){
       setSize(Number(n))
     }
   }
 
-  const validateMove = (clickedTilePos) =>{
-    return (clickedTilePos[0] == emptyPos[0]-1 && clickedTilePos[1] == emptyPos[1]) ||
-           (clickedTilePos[0] == emptyPos[0]+1 && clickedTilePos[1] == emptyPos[1]) ||
-           (clickedTilePos[1] == emptyPos[1]-1 && clickedTilePos[0] == emptyPos[0]) || 
-           (clickedTilePos[1] == emptyPos[1]+1 && clickedTilePos[0] == emptyPos[0])
-  }
-
   const handleMove = (clickedTilePos) => {
-
-    if (!timerActive) {
-      setTimerActive(true)
-      intervalRef.current = setInterval(() => {
-        setTimeElapsed(prev => prev + 1)
-      }, 1000)
+    if (!AISolving){
+      const index = clickedTilePos
+      const emptyIndex = state.emptyIndex;
+    
+      const validMoves = [
+        emptyIndex - size,  // Up
+        emptyIndex + size,  // Down
+        emptyIndex - 1,     // Left
+        emptyIndex + 1      // Right
+      ];
+    
+      const isValid =
+        validMoves.includes(index) &&
+        Math.abs((emptyIndex % size) - (index % size)) <= 1; 
+    
+      if (!isValid) return;
+    
+      if (!timerActive) {
+        setTimerActive(true);
+        intervalRef.current = setInterval(() => {
+          setTimeElapsed((prev) => prev + 1);
+        }, 1000);
+      }
+    
+      const newTiles = [...tiles];
+      [newTiles[emptyIndex], newTiles[index]] = [newTiles[index], newTiles[emptyIndex]];
+      game.move(newTiles); 
+      setState(game.currentState);
+      setTiles(game.tiles);
+      setMoves(game.currentState.depth);
+      setCompleted(game.completed);
     }
-
-    if (validateMove(clickedTilePos)){
-      let tempTiles = []
-      tiles.forEach((row, rowIndex) => {
-        tempTiles.push([])
-        row.forEach(num =>{
-          tempTiles[rowIndex].push(num)
-        })
-      })
-
-      [tempTiles[emptyPos[0]][emptyPos[1]],tempTiles[clickedTilePos[0]][clickedTilePos[1]]] = [tempTiles[clickedTilePos[0]][clickedTilePos[1]],tempTiles[state.emptyPos[0]][state.emptyPos[1]]]
-      game.move(tempTiles)
-      setState(game.currentState)
-      setTiles(game.currentTileSeq)
-      setEmptyPos(game.currentState.emptyPos)
-      setMoves(game.currentState.depth)
-      setCompleted(game.completed)
-    } 
-  }
-
+    
+  };
+  
   const handleSolve = () => {
-    setAISolving(true)
-    let solutionPath = new PuzzleSolver(game, "WALKING DISTANCE").solve()
-    solutionPath.forEach((gameState, i) => {
-      setTimeout(()=>{
-        setTiles(gameState.tileSeq)
-      }, i * 1000)
-    })
-  }
+    setAISolving(true);
+    setDisableAI(true)
 
+    const worker = new Worker(new URL('./Solver/Worker.js', import.meta.url));
+    worker.postMessage({
+      gameData: {
+        size: game.size,
+        currentState: game.currentState,
+        goal: game.goal,
+        tiles: game.tiles,
+        start: game.start
+      },
+      heuristic: "WALKING DISTANCE"
+    });
+  
+    worker.onmessage = (e) => {
+      const { path } = e.data;
+      path.forEach((tiles, i) => {
+        setTimeout(() => {
+          setTiles(tiles);
+        }, i * 500); // adjust speed as needed
+      });
+      const duration = path.length * 500;
+      setTimeout(() => {
+        setAISolving(false);
+      }, duration);
+      worker.terminate();
+    };
+  };
+  
   const handleShuffle = () => {
     const newGame = new Game(size)
     setGame(newGame)
     setCopy(newGame.clone())
     setState(newGame.currentState)
-    setTiles(newGame.currentTileSeq)
-    setEmptyPos(newGame.currentState.emptyPos)
+    setTiles(newGame.tiles)
     setMoves(newGame.currentState.depth)
     setCompleted(newGame.completed)
 
@@ -142,15 +160,14 @@ function App() {
     clearInterval(intervalRef.current)
     setTimerActive(false)
 
-    setAISolving(false)
+    setDisableAI(false)
   }
 
   const handleReset = () => {
     const newGame = copy.clone()
     setGame(newGame)
     setState(newGame.currentState)
-    setTiles(newGame.currentTileSeq)
-    setEmptyPos(newGame.currentState.emptyPos)
+    setTiles(newGame.tiles)
     setMoves(newGame.currentState.depth)
     setCompleted(newGame.completed)
 
@@ -158,7 +175,7 @@ function App() {
     clearInterval(intervalRef.current)
     setTimerActive(false)
 
-    setAISolving(false)
+    setDisableAI(false)
   }
 
   const handleImageUpload = (e) =>{
@@ -185,7 +202,8 @@ function App() {
         onSolve={handleSolve}
         onImageUpload={handleImageUpload}
         onImageRemove={handleImageRemove}
-        disableAI={size !== 3 || AISolving}
+        disableAI={size !== 3 || disableAI}
+        AISolving={AISolving}
       />
       <Board
         state={tiles}
