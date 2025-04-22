@@ -13,7 +13,7 @@ export class Solver {
     constructor(game: Game, heuristic: string) {
         this.game = game;
         this.heuristic = heuristic;
-        this.start = this.game.start;
+        this.start = this.game.currentState;
         this.goal = this.game.goal;
     }
 
@@ -31,7 +31,7 @@ export class Solver {
 
             if (current.equals(this.goal)) {
                 let curr = current;
-                while (curr.parent) {
+                while (curr.parent && !this.start.equals(curr)) {
                     solutionPath.push(curr);
                     curr = curr.parent;
                 }

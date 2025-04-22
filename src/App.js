@@ -4,7 +4,6 @@ import Controls from "./components/Controls"
 import Header from "./components/Header"
 import Footer from "./components/Footer"
 import "./styles/App.css"
-const { Solver } = require("./Solver/Solver.ts")
 const { Game } = require("./gameLogic/Game.ts")
 
 
@@ -20,6 +19,7 @@ function App() {
 
   const [disableAI, setDisableAI] = useState(false)
   const [AISolving, setAISolving] = useState(false)
+  const [AIMoves, setAIMoves] = useState(0)
 
   const [timeElapsed, setTimeElapsed] = useState(0)
   const [timerActive, setTimerActive] = useState(false)
@@ -117,8 +117,10 @@ function App() {
   };
   
   const handleSolve = () => {
-    setAISolving(true);
+    setAISolving(true)
     setDisableAI(true)
+    setTimerActive(false)
+    clearInterval(intervalRef.current)
 
     const worker = new Worker(new URL('./Solver/Worker.js', import.meta.url));
     worker.postMessage({
@@ -126,20 +128,20 @@ function App() {
         size: game.size,
         currentState: game.currentState,
         goal: game.goal,
-        tiles: game.tiles,
-        start: game.start
+        tiles: game.tiles
       },
       heuristic: "WALKING DISTANCE"
     });
   
     worker.onmessage = (e) => {
       const { path } = e.data;
+      setAIMoves(path.length)
       path.forEach((tiles, i) => {
         setTimeout(() => {
           setTiles(tiles);
-        }, i * 500); // adjust speed as needed
+        }, i * 750); // adjust speed as needed
       });
-      const duration = path.length * 500;
+      const duration = path.length * 750;
       setTimeout(() => {
         setAISolving(false);
       }, duration);
@@ -161,6 +163,7 @@ function App() {
     setTimerActive(false)
 
     setDisableAI(false)
+    setAIMoves(0)
   }
 
   const handleReset = () => {
@@ -176,6 +179,7 @@ function App() {
     setTimerActive(false)
 
     setDisableAI(false)
+    setAIMoves(0)
   }
 
   const handleImageUpload = (e) =>{
@@ -210,7 +214,7 @@ function App() {
         onTileClick={handleMove}
         backgroundImage={backgroundImage}
       />
-      <Footer moves={moves} time={timeElapsed}/>
+      <Footer moves={moves} AIMoves={AIMoves} time={timeElapsed}/>
     </div>
   )
 }

@@ -17,13 +17,22 @@ export class Game {
     }
 
     private generateStartBoard(): State {
-        let nums = Array.from({ length: this.size * this.size }, (_, i) => i);
+        let nums: number[];
+    
         do {
-            nums = nums.sort(() => Math.random() - 0.5);
-        } while (!this.isSolvable(nums));
-
+            nums = Array.from({ length: this.size * this.size }, (_, i) => i);
+    
+            // Fisher-Yates shuffle
+            for (let i = nums.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [nums[i], nums[j]] = [nums[j], nums[i]];
+            }
+    
+        } while (!this.isSolvable(nums) || nums.every((val, idx) => val === this.goal.tiles[idx]));
+    
         return new State(nums, 0, null, this.goal, this.size);
     }
+    
 
     private generateGoalBoard(): State {
         const goal = Array.from({ length: this.size * this.size }, (_, i) => (i + 1) % (this.size * this.size));
@@ -64,10 +73,10 @@ export class Game {
 
     static fromData(data: any) {
         const game = new Game(data.size);
-        game.currentState = State.fromData(data.currentState);
         game.goal = State.fromData(data.goal);
+        game.currentState = State.fromData(data.currentState);
         game.tiles = data.tiles;
-        game.start = State.fromData(data.currentState)
+        
         return game;
     } 
 }

@@ -1,7 +1,8 @@
 import "../styles/Footer.css"
-const Footer = ({ moves, time}) => {
+const Footer = ({ moves, AIMoves, time}) => {
     return(
         <footer className="footer">
+            {AIMoves > 0 && <div>AI Moves: {AIMoves}</div>}
             <div>Moves: {moves}</div>
             <div>
                 {time < 60 ? 
