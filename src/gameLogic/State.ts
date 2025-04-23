@@ -7,6 +7,7 @@ export class State {
     private cost: number = 0;
     public size: number;
 
+    // creates a new State object and initalizes all variables
     constructor(tiles: number[], depth: number, parent: State | null, goal: State | null, size: number) {
         this.tiles = tiles;
         this.depth = depth;
@@ -16,11 +17,13 @@ export class State {
         this.emptyIndex = this.tiles.indexOf(0);
     }
 
+    // check if one State has the same tiles as another
     public equals(other: State | null): boolean {
         if (!other) return false;
         return this.tiles.every((val, i) => val === other.tiles[i]);
     }
 
+    // calculate the cost for a given heuristic
     public calculateCost(heuristic: string) {
         switch (heuristic) {
             case "WALKING DISTANCE":
@@ -31,11 +34,13 @@ export class State {
         }
     }
 
+    // calculate the cost using walking distance
     private calculateWalkingDistance(): number {
         if (!this.goal) return 0;
         let total = 0;
         for (let i = 0; i < this.tiles.length; i++) {
             const val = this.tiles[i];
+            // don't calculate the cost for the empty tile
             if (val === 0) continue;
             const currRow = Math.floor(i / this.size);
             const currCol = i % this.size;
