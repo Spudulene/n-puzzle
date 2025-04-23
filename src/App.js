@@ -75,6 +75,7 @@ function App() {
   },[completed])
 
   const handleSetSize = (n) => {
+    setDisableAI(false)
     if (Number(n) <= 6 && n !== ""){
       setSize(Number(n))
     }
