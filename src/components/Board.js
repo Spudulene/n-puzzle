@@ -8,11 +8,14 @@ const Board = ({ state, onTileClick, backgroundImage }) => {
   return (
     <div
       className="board"
+      // repeat the n columns and n rows
       style={{
         gridTemplateColumns: `repeat(${size}, 1fr)`,
         gridTemplateRows: `repeat(${size}, 1fr)`,
       }}
     >
+      {/* loop through all of the tiles in the baord and 
+      create a tile based on that row and column */}
       {state.flat().map((value, index) => {
         const row = Math.floor(index / size);
         const col = index % size;

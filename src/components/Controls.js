@@ -4,6 +4,7 @@ import "../styles/Controls.css"
 const Controls = ({ size, setSize, onShuffle, onReset, onSolve, onImageUpload, onImageRemove, disableAI}) => {
     const fileInputRef = useRef();
 
+    // gives functionality to the stylized upload image button
     const handleFileClick = () => {
         fileInputRef.current.click();
     }
@@ -18,6 +19,7 @@ const Controls = ({ size, setSize, onShuffle, onReset, onSolve, onImageUpload, o
         <button onClick={onShuffle}>Shuffle</button>
         <button onClick={onReset}>Reset</button>
 
+        {/* hidden file upload button */}
         <input
             type="file"
             accept="image/*"
@@ -25,6 +27,7 @@ const Controls = ({ size, setSize, onShuffle, onReset, onSolve, onImageUpload, o
             onChange={(e) => onImageUpload(e)}
             style={{ display: "none" }}
         />
+        {/* stylized button that connects to the standard upload button */}
         <button onClick={handleFileClick}>Upload Image</button>
         <button onClick={onImageRemove}>Remove Image</button>
         </div>

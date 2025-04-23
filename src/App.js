@@ -39,7 +39,7 @@ function App() {
     setEmptyPos(game.currentState.emptyPos)
   }
 
-  // whenever the user changes the size, create a new game
+  // whenever the user changes the size, create a new game and reset the timer
   useEffect(()=>{
     const newGame = new Game(size)
     setGame(newGame)
@@ -55,7 +55,7 @@ function App() {
     setTimerActive(false)
   },[size])
 
-  // if the use completes the puzzle, give them a new one
+  // if the user completes the puzzle, give them a new one
   useEffect(()=>{
     if(completed) {
       setTimeout(() => {
@@ -76,13 +76,15 @@ function App() {
     }
   },[completed])
 
+  // make sure the size is a number and set the size
   const handleSetSize = (n) => {
-    console.log(n)
     if (Number(n) <= 6 && n !== ""){
       setSize(Number(n))
     }
   }
 
+  // make sure that the clicked tile is is in the bounds of the puzzle and
+  // that the clicked tile is orthogonal to the empty tile
   const validateMove = (clickedTilePos) =>{
     return (clickedTilePos[0] == emptyPos[0]-1 && clickedTilePos[1] == emptyPos[1]) ||
            (clickedTilePos[0] == emptyPos[0]+1 && clickedTilePos[1] == emptyPos[1]) ||
@@ -90,8 +92,10 @@ function App() {
            (clickedTilePos[1] == emptyPos[1]+1 && clickedTilePos[0] == emptyPos[0])
   }
 
+  // starts timer if necessary, validates the suggested move, and performs the move if valid
   const handleMove = (clickedTilePos) => {
 
+    // if the timer is not active, this is the first move so we should start the timer
     if (!timerActive) {
       setTimerActive(true)
       intervalRef.current = setInterval(() => {
@@ -99,10 +103,14 @@ function App() {
       }, 1000)
     }
 
+    // check if the move is a valid move
     if (validateMove(clickedTilePos)){
-      const tempTiles = tiles.map(row => [...row]);
 
+      // make a copy of the current tiles and swap the empty position and clicked position
+      const tempTiles = tiles.map(row => [...row]);
       [tempTiles[emptyPos[0]][emptyPos[1]],tempTiles[clickedTilePos[0]][clickedTilePos[1]]] = [tempTiles[clickedTilePos[0]][clickedTilePos[1]],tempTiles[state.emptyPos[0]][state.emptyPos[1]]]
+
+      // do the move through the game object and update state variables
       game.move(tempTiles)
       setState(game.currentState)
       setTiles(game.currentTileSeq)
@@ -112,6 +120,7 @@ function App() {
     } 
   }
 
+  // starts the AI solving and displays the found solution path
   const handleSolve = () => {
     setAISolving(true)
     let solutionPath = new PuzzleSolver(game, "WALKING DISTANCE").solve()
@@ -122,6 +131,7 @@ function App() {
     })
   }
 
+  // shuffles the board, reset the timer, and unblock the AI solver
   const handleShuffle = () => {
     const newGame = new Game(size)
     setGame(newGame)
@@ -139,6 +149,7 @@ function App() {
     setAISolving(false)
   }
 
+  // resets the board to the most recent shuffle, reset the timer, and unblock the AI solver
   const handleReset = () => {
     const newGame = copy.clone()
     setGame(newGame)
@@ -155,13 +166,17 @@ function App() {
     setAISolving(false)
   }
 
+  // gets the file that was uploaded and sets it as the background image
   const handleImageUpload = (e) =>{
+    // get the first file that was uploaded
+    // and use it as the image
     if (e.target.files[0]) {
       const imageUrl = URL.createObjectURL(e.target.files[0])
       setBackgroundImage(imageUrl)
     }
   }
 
+  // reset the background image
   const handleImageRemove = () => {
     setBackgroundImage(null)
   }
