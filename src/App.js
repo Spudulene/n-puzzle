@@ -100,13 +100,7 @@ function App() {
     }
 
     if (validateMove(clickedTilePos)){
-      let tempTiles = []
-      tiles.forEach((row, rowIndex) => {
-        tempTiles.push([])
-        row.forEach(num =>{
-          tempTiles[rowIndex].push(num)
-        })
-      })
+      const tempTiles = tiles.map(row => [...row]);
 
       [tempTiles[emptyPos[0]][emptyPos[1]],tempTiles[clickedTilePos[0]][clickedTilePos[1]]] = [tempTiles[clickedTilePos[0]][clickedTilePos[1]],tempTiles[state.emptyPos[0]][state.emptyPos[1]]]
       game.move(tempTiles)
