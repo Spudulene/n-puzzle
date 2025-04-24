@@ -25,6 +25,8 @@ function App() {
   const [timerActive, setTimerActive] = useState(false)
   const intervalRef = useRef(null)
 
+  const [disableMove, setDisableMove] = useState(false)
+
   const [backgroundImage, setBackgroundImage] = useState(null)
 
   const hasRun = useRef()
@@ -54,28 +56,24 @@ function App() {
     setTimerActive(false)
   },[size])
 
-  // if the use completes the puzzle, give them a new one
+  // if the user completes the puzzle, give them a new one
   useEffect(()=>{
     if(completed) {
+      setDisableMove(true)
       setTimeout(() => {
-        window.alert(`Congratulations, you solved the puzzle in ${timeElapsed < 60 ? timeElapsed + "s": Math.floor(timeElapsed / 60) + "m " + timeElapsed % 60 + "s" } using ${moves} moves. Here's a new one.`)
-        const newGame = new Game(size)
-        setGame(newGame)
-        setCopy(newGame.clone())
-        setState(newGame.currentState)
-        setTiles(newGame.tiles)
-        setMoves(newGame.currentState.depth)
-        setCompleted(newGame.completed)
+        window.alert(`Congratulations, you solved the puzzle in ${timeElapsed < 60 ? timeElapsed + "s": Math.floor(timeElapsed / 60) + "m " + timeElapsed % 60 + "s" } using ${moves} moves. You can reset the puzzle or shuffle it to play again!`)
       }, 500)
 
-      setTimeElapsed(0)
+      setDisableAI(true)
       clearInterval(intervalRef.current)
       setTimerActive(false)
     }
   },[completed])
 
+  // checks that the input size is a number and sets the variable
   const handleSetSize = (n) => {
     setDisableAI(false)
+    setDisableMove(false)
     if (Number(n) <= 6 && n !== ""){
       setSize(Number(n))
     }
@@ -84,7 +82,7 @@ function App() {
   // starts the timer if needed, validates the move and then performs the move on the game object
   const handleMove = (clickedTilePos) => {
     // don't allow the user to make a move while the AI is solving
-    if (!AISolving){
+    if (!AISolving && !disableMove){
       const index = clickedTilePos
       const emptyIndex = state.emptyIndex;
     
@@ -186,6 +184,8 @@ function App() {
 
     setDisableAI(false)
     setAIMoves(0)
+
+    setDisableMove(false)
   }
 
   // resets the board to its original shuffle, resets the timer
@@ -204,6 +204,8 @@ function App() {
 
     setDisableAI(false)
     setAIMoves(0)
+
+    setDisableMove(false)
   }
 
   // sets the background image for the puzzle
@@ -235,6 +237,7 @@ function App() {
         onImageRemove={handleImageRemove}
         disableAI={size !== 3 || disableAI}
         AISolving={AISolving}
+        highlight={disableMove}
       />
       <Board
         state={tiles}
