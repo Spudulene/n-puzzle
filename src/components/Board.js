@@ -15,13 +15,7 @@ const Board = ({ state, onTileClick, backgroundImage }) => {
         gridTemplateRows: `repeat(${size}, 1fr)`,
       }}
     >
-<<<<<<< HEAD
-      {/* loop through all of the tiles in the baord and 
-      create a tile based on that row and column */}
-      {state.flat().map((value, index) => {
-=======
       {state.map((value, index) => {
->>>>>>> 910e47d101df247974aa970161c76c1305701332
         const row = Math.floor(index / size);
         const col = index % size;
         // render each tile passing in the value from the board

@@ -11,11 +11,7 @@ const Tile = ({ value, onClick, backgroundImage, gridSize }) => {
     // blow up the image so that we are able to display a small 
     // portion of the whole image on each tile
     backgroundSize: `${gridSize * 100}%`,
-<<<<<<< HEAD
-    /// set the visible portion of the image based on what the tile value is (where the tile should be)
-=======
     // set the visible portion of the image based on what the tile value is (where the tile should be)
->>>>>>> 910e47d101df247974aa970161c76c1305701332
     backgroundPosition: backgroundImage && !isEmpty 
       ? `${(value - 1) % gridSize * (100 / (gridSize - 1))}% ${Math.floor((value - 1) / gridSize) * (100 / (gridSize - 1))}%`
       : undefined,
