@@ -14,7 +14,7 @@ const Controls = ({ size, setSize, onShuffle, onReset, onSolve, onImageUpload, o
         <div className="controls">
         <span>
             Board Size: 
-            <input type="number" min="3" max="6" value={size} onChange={(e) =>setSize(e.target.value)}></input>
+            <input disabled={AISolving} type="number" min="3" max="6" value={size} onChange={(e) =>setSize(e.target.value)}></input>
         </span>
         <button disabled={disableAI} onClick={onSolve} className={disableAI ? "disabled" : ""}>Solve using AI</button>
         <button disabled={AISolving} onClick={onShuffle} className={AISolving ? "disabled" : highlight ? "highlight" : ""}>Shuffle</button>

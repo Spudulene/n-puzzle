@@ -90,6 +90,6 @@ export class State {
         const state = new State(data.tiles, data.depth, data.parent, data.goal, data.size);
         state.emptyIndex = data.emptyIndex;
         return state;
-      }
+    }
 }
 

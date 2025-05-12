@@ -74,6 +74,7 @@ function App() {
   const handleSetSize = (n) => {
     setDisableAI(false)
     setDisableMove(false)
+    setAIMoves(0)
     if (Number(n) <= 6 && n !== ""){
       setSize(Number(n))
     }
@@ -125,6 +126,7 @@ function App() {
   // starts the solver by starting a worker thread
   const handleSolve = () => {
     // disable AI, shuffle, and reset, and stop the timer
+    setDisableMove(true)
     setAISolving(true)
     setDisableAI(true)
     setTimerActive(false)
@@ -235,7 +237,7 @@ function App() {
         onSolve={handleSolve}
         onImageUpload={handleImageUpload}
         onImageRemove={handleImageRemove}
-        disableAI={size !== 3 || disableAI}
+        disableAI={size >= 6 || disableAI}
         AISolving={AISolving}
         highlight={disableMove}
       />
