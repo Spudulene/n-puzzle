@@ -1,24 +1,32 @@
-import { PriorityQueue } from "./PriorityQueue.js";
-
-export class State{
-    public tileSeq : number[][];
-    public depth : number;
-    public parent : State | null;
-    public emptyPos : number[];
+export class State {
+    public tiles: number[];
+    public depth: number;
+    public parent: State | null;
+    public emptyIndex: number;
     private goal: State | null;
+<<<<<<< HEAD
     private cost : number;
     private size : number;
     
     // creates a new State object
     public constructor(tileSeq : number[][], depth: number, parent: State | null, goal: State | null){
         this.tileSeq = tileSeq;
+=======
+    private cost: number = 0;
+    public size: number;
+
+    // creates a new State object and initalizes all variables
+    constructor(tiles: number[], depth: number, parent: State | null, goal: State | null, size: number) {
+        this.tiles = tiles;
+>>>>>>> 910e47d101df247974aa970161c76c1305701332
         this.depth = depth;
         this.parent = parent;
         this.goal = goal;
-        this.size = tileSeq.length;
-        this.findEmptyTile()
+        this.size = size;
+        this.emptyIndex = this.tiles.indexOf(0);
     }
 
+<<<<<<< HEAD
     // check if one state equals another
     public equals (other: State | null){
         if (other === null) return;
@@ -35,35 +43,26 @@ export class State{
     }
 
     // calculate the 'cost' of the current state based on the heuristic passed
+=======
+    // check if one State has the same tiles as another
+    public equals(other: State | null): boolean {
+        if (!other) return false;
+        return this.tiles.every((val, i) => val === other.tiles[i]);
+    }
+
+    // calculate the cost for a given heuristic
+>>>>>>> 910e47d101df247974aa970161c76c1305701332
     public calculateCost(heuristic: string) {
         switch (heuristic) {
-            // time: .5 sec. moves: 88
-            case "MISPLACED":
-                this.cost = this.calculateMisplaced();
-                break;
-            // time: .1 sec. moves: 51
-            case "MANHATTAN":
-                this.cost = this.calculateManhattanDistance();
-                break;
-            // time: .3 sec. moves: 75
-            case "INVERSIONS":
-                this.cost = this.calculateInversionCount();
-                break;
-            // time: .06 sec. moves: 32
             case "WALKING DISTANCE":
                 this.cost = this.calculateWalkingDistance();
                 break;
-            // time: 10 sec. moves: 22
-            case "MANHATTAN AND DEPTH":
-                this.cost = this.calculateManhattanDistanceAndDepth();
-                break;
-            // time: .5 sec. moves: 39
-            case "MANHATTAN AND LINEAR CONFLICT":
-                this.cost = this.calculateManhattanDistanceAndLinearConflict();
-                break;
+            default:
+                this.cost = this.depth;
         }
     }
 
+<<<<<<< HEAD
     // calculate the cost based on the misplaced tiles
     private calculateMisplaced(){
         if (this.goal === null) return 0;
@@ -78,10 +77,27 @@ export class State{
                     misplaced++;
                 }
             }
+=======
+    // calculate the cost using walking distance
+    private calculateWalkingDistance(): number {
+        if (!this.goal) return 0;
+        let total = 0;
+        for (let i = 0; i < this.tiles.length; i++) {
+            const val = this.tiles[i];
+            // don't calculate the cost for the empty tile
+            if (val === 0) continue;
+            const currRow = Math.floor(i / this.size);
+            const currCol = i % this.size;
+            const goalIdx = this.goal.tiles.indexOf(val);
+            const goalRow = Math.floor(goalIdx / this.size);
+            const goalCol = goalIdx % this.size;
+            total += Math.abs(currRow - goalRow) + Math.abs(currCol - goalCol);
+>>>>>>> 910e47d101df247974aa970161c76c1305701332
         }
-        return misplaced;
+        return total;
     }
 
+<<<<<<< HEAD
     // calculated the cost based on the manhattan (straight-line) distance
     private calculateManhattanDistance(){
         let size = this.tileSeq.length;
@@ -101,25 +117,18 @@ export class State{
             // calculate the distance but not allowing diagonal movements
             return sum + Math.abs(b % size - g % size) + Math.abs(Math.floor(b / size) - Math.floor(g / size));
         }, 0);
+=======
+    public getCost(): number {
+        return this.cost;
+>>>>>>> 910e47d101df247974aa970161c76c1305701332
     }
 
-    private calculateInversionCount(){
-        let inversions = 0;
-        let flattenedState : number[] = [];
-        // Flatten the start state
-        flattenedState = this.tileSeq.flat()
-    
-        // Count inversions
-        for (let i = 0; i < this.size * this.size; i++) {
-            for (let j = i + 1; j < this.size * this.size; j++) {
-                if (flattenedState[j] !== 0 && flattenedState[i] !== 0 && flattenedState[i] > flattenedState[j]) {
-                    inversions++;
-                }
-            }
-        }
-        return inversions;
-    }
+    public generateChildren(): State[] {
+        const children: State[] = [];
+        const row = Math.floor(this.emptyIndex / this.size);
+        const col = this.emptyIndex % this.size;
 
+<<<<<<< HEAD
     // calculate the cost based on the walking distance
     private calculateWalkingDistance(){
         const size = this.size;
@@ -152,43 +161,30 @@ export class State{
       
         return walkingDistance;
     }
+=======
+        const moves = [
+            [-1, 0], [1, 0], [0, -1], [0, 1]
+        ];
+>>>>>>> 910e47d101df247974aa970161c76c1305701332
 
-    private calculateLinearConflict() {
-        let conflict = 0;
+        for (const [dRow, dCol] of moves) {
+            const newRow = row + dRow;
+            const newCol = col + dCol;
+            if (newRow < 0 || newCol < 0 || newRow >= this.size || newCol >= this.size) continue;
 
-        // Row conflicts
-        for (let row = 0; row < this.size; row++) {
-            let maxVal = -1;
-            for (let col = 0; col < this.size; col++) {
-                const value = this.tileSeq[row][col];
-                if (value !== 0 && Math.floor((value - 1) / this.size) === row) {
-                    if (value > maxVal) {
-                        maxVal = value;
-                    } else {
-                        conflict += 2;
-                    }
-                }
+            const newIndex = newRow * this.size + newCol;
+            const newTiles = [...this.tiles];
+            [newTiles[this.emptyIndex], newTiles[newIndex]] = [newTiles[newIndex], newTiles[this.emptyIndex]];
+            const child = new State(newTiles, this.depth + 1, this, this.goal, this.size);
+            if (!this.parent || !child.equals(this.parent)) {
+                children.push(child);
             }
         }
 
-        // Column conflicts
-        for (let col = 0; col < this.size; col++) {
-            let maxVal = -1;
-            for (let row = 0; row < this.size; row++) {
-                const value = this.tileSeq[row][col];
-                if (value !== 0 && (value - 1) % this.size === col) {
-                    if (value > maxVal) {
-                        maxVal = value;
-                    } else {
-                        conflict += 2;
-                    }
-                }
-            }
-        }
-
-        return conflict;
+        return children;
     }
 
+<<<<<<< HEAD
     // manhattan distance + depth (standard A*)
     private calculateManhattanDistanceAndDepth(){
         if (this.goal === null) return 0;
@@ -199,8 +195,20 @@ export class State{
     private calculateManhattanDistanceAndLinearConflict(){
         if (this.goal === null) return 0;
         return this.calculateManhattanDistance() + this.calculateLinearConflict();
+=======
+    public getHash(): string {
+        return this.tiles.join(",");
     }
 
+    static fromData(data: any) {
+        const state = new State(data.tiles, data.depth, data.parent, data.goal, data.size);
+        state.emptyIndex = data.emptyIndex;
+        return state;
+>>>>>>> 910e47d101df247974aa970161c76c1305701332
+    }
+}
+
+<<<<<<< HEAD
     // generates all possible children/neighbor states for the current state
     public generateChildren(){
         let row = this.emptyPos[0];
@@ -303,3 +311,5 @@ export class State{
         this.emptyPos = [Math.floor(flattened.indexOf(0) / this.size) ,flattened.indexOf(0) % this.size]
     }
 }
+=======
+>>>>>>> 910e47d101df247974aa970161c76c1305701332

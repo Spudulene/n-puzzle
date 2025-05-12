@@ -21,6 +21,10 @@
   transition: background-color 0.2s ease;
 }
 
+.controls .highlight {
+  background-color: #89043D;
+}
+
 .controls button:hover {
   background-color: #89043D;
 }
